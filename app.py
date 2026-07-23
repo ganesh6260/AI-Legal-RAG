@@ -1,5 +1,6 @@
 import streamlit as st
 import fitz
+from utils import chunk_text
 
 st.set_page_config(
     page_title="AI Legal Assistant",
@@ -16,6 +17,7 @@ uploaded_file = st.file_uploader(
 )
 
 if uploaded_file is not None:
+
     st.success("PDF Uploaded Successfully ✅")
 
     st.write("### File Details")
@@ -31,3 +33,15 @@ if uploaded_file is not None:
 
     st.write("## Extracted Text")
     st.text(text[:3000])
+
+    # Create Chunks
+    chunks = chunk_text(text)
+
+    st.write("## Number of Chunks")
+    st.success(len(chunks))
+
+    st.write("## First 5 Chunks")
+
+    for i, chunk in enumerate(chunks[:5]):
+        st.write(f"### Chunk {i+1}")
+        st.write(chunk)
