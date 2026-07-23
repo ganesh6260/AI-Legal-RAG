@@ -2,6 +2,7 @@ import streamlit as st
 import fitz
 from utils import chunk_text
 from embeddings import create_embeddings
+from vectordb import store_embeddings
 
 st.set_page_config(
     page_title="AI Legal Assistant",
@@ -48,7 +49,18 @@ if uploaded_file is not None:
         st.write(chunk)
 
     # Create Embeddings
+        # Create Embeddings
     embeddings = create_embeddings(chunks)
+
+    try:
+        collection = store_embeddings(chunks, embeddings)
+
+        st.success("Embeddings stored successfully!")
+
+        st.write("Total Records:", collection.count())
+
+    except Exception as e:
+        st.error(f"Error: {e}")
 
     st.write("## Embedding Information")
 
@@ -59,3 +71,9 @@ if uploaded_file is not None:
     st.write("First 10 Values of First Embedding:")
 
     st.write(embeddings[0][:10])
+
+    st.write("## ChromaDB")
+
+    st.success("Embeddings Stored Successfully! ✅")
+
+    st.write("Total Records:", collection.count())
