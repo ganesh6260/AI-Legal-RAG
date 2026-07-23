@@ -1,6 +1,7 @@
 import streamlit as st
 import fitz
 from utils import chunk_text
+from embeddings import create_embeddings
 
 st.set_page_config(
     page_title="AI Legal Assistant",
@@ -45,3 +46,16 @@ if uploaded_file is not None:
     for i, chunk in enumerate(chunks[:5]):
         st.write(f"### Chunk {i+1}")
         st.write(chunk)
+
+    # Create Embeddings
+    embeddings = create_embeddings(chunks)
+
+    st.write("## Embedding Information")
+
+    st.success(f"Total Embeddings: {len(embeddings)}")
+
+    st.write("Embedding Dimension:", len(embeddings[0]))
+
+    st.write("First 10 Values of First Embedding:")
+
+    st.write(embeddings[0][:10])
