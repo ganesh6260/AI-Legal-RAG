@@ -3,6 +3,7 @@ import fitz
 from utils import chunk_text
 from embeddings import create_embeddings
 from vectordb import store_embeddings
+from retriever import search_documents
 
 st.set_page_config(
     page_title="AI Legal Assistant",
@@ -26,6 +27,7 @@ if uploaded_file is not None:
     st.write("Filename:", uploaded_file.name)
     st.write("File Size:", uploaded_file.size, "bytes")
 
+    # Read PDF
     pdf = fitz.open(stream=uploaded_file.read(), filetype="pdf")
 
     text = ""
@@ -49,19 +51,18 @@ if uploaded_file is not None:
         st.write(chunk)
 
     # Create Embeddings
-        # Create Embeddings
     embeddings = create_embeddings(chunks)
 
     try:
         collection = store_embeddings(chunks, embeddings)
 
-        st.success("Embeddings stored successfully!")
-
+        st.success("Embeddings Stored Successfully! ✅")
         st.write("Total Records:", collection.count())
 
     except Exception as e:
         st.error(f"Error: {e}")
 
+    # Embedding Information
     st.write("## Embedding Information")
 
     st.success(f"Total Embeddings: {len(embeddings)}")
@@ -72,8 +73,31 @@ if uploaded_file is not None:
 
     st.write(embeddings[0][:10])
 
+    # ChromaDB
     st.write("## ChromaDB")
 
     st.success("Embeddings Stored Successfully! ✅")
 
     st.write("Total Records:", collection.count())
+
+    # ==============================
+    # Ask Questions From PDF
+    # ==============================
+
+    st.write("## 💬 Ask Questions From PDF")
+
+    question = st.text_input(
+        "Ask your question"
+    )
+
+    if question:
+
+        results = search_documents(question)
+
+        st.write("## 🔍 Top Matching Chunks")
+
+        documents = results["documents"][0]
+
+        for i, doc in enumerate(documents):
+            st.write(f"### Result {i+1}")
+            st.write(doc)
