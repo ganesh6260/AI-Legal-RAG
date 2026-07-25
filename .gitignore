@@ -16,3 +16,12 @@ __pycache__/
 
 # ChromaDB
 chroma_db/
+
+# Streamlit Cache
+.streamlit/
+
+# Python Environment
+.python-version
+
+# Jupyter Notebook Checkpoints
+.ipynb_checkpoints/
