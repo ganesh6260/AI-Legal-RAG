@@ -1,11 +1,11 @@
 import streamlit as st
 import fitz
 import time
-from utils import chunk_text
-from embeddings import create_embeddings
-from vectordb import store_embeddings
-from retriever import search_documents
-from llm import generate_answer
+
+from utils.utils import chunk_text
+from rag.vectordb import store_embeddings
+from rag.retriever import search_documents
+from llm.llm import generate_answer
 
 st.set_page_config(
     page_title="AI Legal Assistant",
@@ -47,13 +47,11 @@ if uploaded_file is not None:
     if st.session_state.current_pdf != uploaded_file.name:
 
         st.session_state.current_pdf = uploaded_file.name
-
         st.session_state.chat_history = []
-
         st.session_state.pdf_processed = False
 
 # -------------------------------
-# Clear Chat Button
+# Clear Chat
 # -------------------------------
 
 if st.sidebar.button("🗑 Clear Chat"):
@@ -63,7 +61,7 @@ if st.sidebar.button("🗑 Clear Chat"):
     st.rerun()
 
 # -------------------------------
-# Process PDF ONLY ONE TIME
+# Process PDF
 # -------------------------------
 
 if uploaded_file is not None and not st.session_state.pdf_processed:
@@ -85,29 +83,27 @@ if uploaded_file is not None and not st.session_state.pdf_processed:
     st.write("## Extracted Text")
     st.text(text[:3000])
 
+    # -------------------------------
     # Chunking
+    # -------------------------------
+
     chunks = chunk_text(text)
 
     st.write("## Number of Chunks")
     st.success(len(chunks))
 
-    # Embeddings
-    embeddings = create_embeddings(chunks)
+    # -------------------------------
+    # Store Documents
+    # -------------------------------
 
-    st.write("## Embedding Information")
-    st.success(f"Total Embeddings: {len(embeddings)}")
+    store_embeddings(chunks)
 
-    # Store in ChromaDB
-    collection = store_embeddings(chunks, embeddings)
-
-    st.success("Embeddings Stored Successfully ✅")
-    st.write("Total Records:", collection.count())
+    st.success("✅ Document Indexed Successfully")
 
     st.session_state.pdf_processed = True
 
-
 # -------------------------------
-# Prepare Chat History for Download
+# Prepare Download Chat
 # -------------------------------
 
 chat_text = "========== AI LEGAL ASSISTANT CHAT ==========\n\n"
@@ -139,18 +135,21 @@ if st.session_state.pdf_processed:
         mime="text/plain"
     )
 
-    # Display Previous Chat
+    # Previous Chat
+
     for message in st.session_state.chat_history:
 
         with st.chat_message(message["role"]):
             st.write(message["content"])
 
-    # Chat Input
-    question = st.chat_input("Ask anything about your PDF...")
+    # User Question
+
+    question = st.chat_input(
+        "Ask anything about your PDF..."
+    )
 
     if question:
 
-        # Save User Message
         st.session_state.chat_history.append(
             {
                 "role": "user",
@@ -161,30 +160,36 @@ if st.session_state.pdf_processed:
         with st.chat_message("user"):
             st.write(question)
 
-        # Retrieve Documents
+        # -------------------------------
+        # Retrieve Context
+        # -------------------------------
+
         results = search_documents(question)
-
-        context = ""
-
-        for doc in results["documents"][0]:
-            context += doc + "\n\n"
 
         source_chunks = results["documents"][0]
 
+        context = "\n\n".join(source_chunks)
+
+        # -------------------------------
         # Generate Answer
+        # -------------------------------
+
         start_time = time.time()
 
         with st.spinner("🤖 AI is thinking..."):
+
             answer = generate_answer(
                 question,
                 context
             )
+            print("ANSWER TYPE:", type(answer))
+            print("ANSWER:", answer)
 
-        end_time = time.time()
+        response_time = round(
+            time.time() - start_time,
+            2
+        )
 
-        response_time = round(end_time - start_time, 2)   
-
-        # Save Assistant Response
         st.session_state.chat_history.append(
             {
                 "role": "assistant",
@@ -192,22 +197,38 @@ if st.session_state.pdf_processed:
             }
         )
 
-        # Display Answer
         with st.chat_message("assistant"):
-            st.write(answer)
-            st.caption(f"⏱ Response Time: {response_time} sec")
 
+            st.write(answer)
+
+            st.caption(
+                f"⏱ Response Time: {response_time} sec"
+            )
+
+        # -------------------------------
         # Source Chunks
+        # -------------------------------
+
         with st.expander("📄 View Source Chunks"):
 
             st.caption(
-                "The following document sections were retrieved and used by the AI to generate the answer."
+                "The following document sections were retrieved and used to answer your question."
             )
 
-            for i, chunk in enumerate(source_chunks):
+            if len(source_chunks) == 0:
 
-                st.markdown(f"### 🔹 Source {i+1}")
+                st.warning(
+                    "No relevant document chunks found."
+                )
 
-                st.info(chunk)
+            else:
 
-                st.divider()
+                for i, chunk in enumerate(source_chunks):
+
+                    st.markdown(
+                        f"### 🔹 Source {i+1}"
+                    )
+
+                    st.info(chunk)
+
+                    st.divider()

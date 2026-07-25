@@ -1,4 +1,4 @@
-from vectordb import vector_store
+from rag.vectordb import vector_store
 
 
 def search_documents(query, top_k=5):
@@ -15,7 +15,6 @@ def search_documents(query, top_k=5):
     distances = []
 
     for doc, score in results:
-
         documents.append(doc.page_content)
         distances.append(score)
 
