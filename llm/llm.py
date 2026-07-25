@@ -14,39 +14,45 @@ llm = ChatGoogleGenerativeAI(
     temperature=0
 )
 
-def generate_answer(question, context):
+
+def generate_answer(question, context, chat_history=""):
     """
     Generate answer using LangChain + Gemini.
+
+    chat_history: optional plain-text summary of prior turns in the
+    conversation (e.g. "User: ...\nAI: ...\n..."), used for multi-turn
+    memory. Defaults to "" for single-turn / backward-compatible use.
     """
 
     prompt = prompt_template.format(
         context=context,
-        question=question
+        question=question,
+        chat_history=chat_history
     )
 
     try:
 
         response = llm.invoke(prompt)
 
-        # Most reliable way
-        if hasattr(response, "text"):
-            return response.text
-
-        # Fallback
+        # Extract Gemini response
         if isinstance(response.content, str):
-            return response.content
 
-        if isinstance(response.content, list):
+            answer = response.content
+
+        elif isinstance(response.content, list):
+
             answer = ""
 
             for item in response.content:
 
-                if isinstance(item, dict):
+                if isinstance(item, dict) and item.get("type") == "text":
                     answer += item.get("text", "")
 
-            return answer.strip()
+        else:
 
-        return str(response.content)
+            answer = str(response.content)
+
+        return answer.strip()
 
     except Exception as e:
 
