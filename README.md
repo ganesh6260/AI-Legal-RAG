@@ -7,7 +7,6 @@
 ![LangChain](https://img.shields.io/badge/LangChain-1.x-1C3C3C)
 ![LangGraph](https://img.shields.io/badge/LangGraph-Memory-purple)
 ![Gemini](https://img.shields.io/badge/LLM-Gemini-orange)
-![License](https://img.shields.io/badge/License-MIT-green)
 
 ---
 
@@ -70,7 +69,7 @@ Each uploaded PDF is assigned its own memory **thread**, so the LLM's conversati
 | Orchestration      | [LangChain 1.x](https://python.langchain.com)    |
 | Conversation Memory| [LangGraph](https://langchain-ai.github.io/langgraph/) |
 | Vector Store       | [ChromaDB](https://www.trychroma.com)            |
-| Embeddings         | Sentence-Transformers / Google embeddings        |
+| Embeddings         | Sentence-Transformers (`all-MiniLM-L6-v2`)        |
 | LLM                | Google Gemini (`gemini-flash-latest`)            |
 | Language           | Python 3.11                                      |
 
@@ -175,12 +174,6 @@ Contributions are welcome! To contribute:
 2. Create a feature branch (`git checkout -b feature/your-feature`)
 3. Commit your changes
 4. Open a pull request
-
----
-
-## 📄 License
-
-This project is licensed under the [MIT License](LICENSE).
 
 ---
 
