@@ -8,8 +8,6 @@
 ![LangGraph](https://img.shields.io/badge/LangGraph-Memory-purple)
 ![Gemini](https://img.shields.io/badge/LLM-Gemini-orange)
 
-### 🚀 [Live Demo](https://ai-legal-rag-ganesh.streamlit.app/)
-
 ---
 
 ## 📖 Overview
@@ -17,6 +15,8 @@
 **AI Legal Assistant** is a Retrieval-Augmented Generation (RAG) application that lets you upload a legal PDF (contracts, agreements, policies, etc.) and ask natural-language questions about it. Instead of relying on the LLM's general knowledge, every answer is **grounded in the actual text of your document** — reducing hallucination and keeping responses traceable to their source.
 
 The assistant also supports **multi-turn conversations with per-document memory**, so follow-up questions like *"what about clause 4?"* or *"does that apply to both parties?"* are understood in context — without mixing up memory across different uploaded documents.
+
+🔗 **Live Demo:** https://ai-legal-rag-ganesh.streamlit.app/
 
 ---
 
