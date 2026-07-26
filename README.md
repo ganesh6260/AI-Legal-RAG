@@ -8,6 +8,8 @@
 ![LangGraph](https://img.shields.io/badge/LangGraph-Memory-purple)
 ![Gemini](https://img.shields.io/badge/LLM-Gemini-orange)
 
+### 🚀 [Live Demo](https://ai-legal-rag-ganesh.streamlit.app/)
+
 ---
 
 ## 📖 Overview
@@ -27,36 +29,6 @@ The assistant also supports **multi-turn conversations with per-document memory*
 - 🔍 **Source transparency** — every answer shows exactly which chunks of the document it was generated from
 - 🖥️ **Clean chat interface** — built with Streamlit, including a collapsible per-document Q&A history sidebar
 - ⚠️ **Graceful error handling** — friendly messages for rate limits, server errors, and unreadable/scanned PDFs
-
----
-
-## 🏗️ Architecture
-
-```
-                ┌──────────────────┐
-   Upload PDF → │  Text Extraction │  (PyMuPDF)
-                └────────┬─────────┘
-                         ▼
-                ┌──────────────────┐
-                │   Chunking       │  (utils/utils.py)
-                └────────┬─────────┘
-                         ▼
-                ┌──────────────────┐
-                │ Embedding + Store│  (rag/vectordb.py — ChromaDB)
-                └────────┬─────────┘
-                         ▼
-   Question → ┌──────────────────┐     ┌────────────────────┐
-              │    Retrieval     │ ──▶ │  Chat Memory Graph  │
-              │ (rag/retriever)  │     │ (rag/chat_graph.py) │
-              └──────────────────┘     └──────────┬──────────┘
-                                                   ▼
-                                        ┌──────────────────────┐
-                                        │   Gemini LLM Answer   │
-                                        │     (llm/llm.py)      │
-                                        └──────────────────────┘
-```
-
-Each uploaded PDF is assigned its own memory **thread**, so the LLM's conversational context never bleeds between different documents in the same session.
 
 ---
 
